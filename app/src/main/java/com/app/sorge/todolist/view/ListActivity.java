@@ -3,12 +3,14 @@ package com.app.sorge.todolist.view;
 import android.arch.lifecycle.LifecycleActivity;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +31,9 @@ import java.util.List;
 import javax.inject.Inject;
 
 public class ListActivity extends LifecycleActivity {
+    private final String EXTRA_DATE="get_date";
+    private final String EXTRA_TITLE="get_title";
+    private final String EXTRA_DESCRIPTION="get_description";
 
     private ListActivityViewModel listActivityViewModel;
     private RecyclerAdapter adapter;
@@ -75,6 +80,7 @@ public class ListActivity extends LifecycleActivity {
                                 date = etxtDate.getText().toString();
                                 Plan plan = new Plan(title, description, date);
                                 listActivityViewModel.addPlan(plan);
+                                Toast.makeText(getApplicationContext(),"The plan was added!",Toast.LENGTH_SHORT).show();
                                 dialog.hide();
                             }
                         }
@@ -171,6 +177,31 @@ public class ListActivity extends LifecycleActivity {
                         Plan p=list.get(i);
                         listActivityViewModel.deletePlan(p);
                         return false;
+                    }
+                });
+
+                itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        int i=getAdapterPosition();
+                        Plan p=list.get(i);
+                        AlertDialog.Builder mBuilder=new AlertDialog.Builder(ListActivity.this);
+                        final View mView=getLayoutInflater().inflate(R.layout.description_dialog,null);
+                        final TextView txtDescription=(TextView)mView.findViewById(R.id.txtDescription);
+                        txtDescription.setMovementMethod(new ScrollingMovementMethod());
+                        Button btnClose=(Button)mView.findViewById(R.id.btnClose);
+                        mBuilder.setView(mView);
+                        final AlertDialog dialog=mBuilder.create();
+                        dialog.show();
+                        txtDescription.setText(p.getDescription());
+                        btnClose.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                dialog.hide();
+                            }
+                        });
+
+
                     }
                 });
             }
